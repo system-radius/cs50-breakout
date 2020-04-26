@@ -16,3 +16,5 @@ Additional bonuses are also included:
 * Skull will decrease the health (paddle size will not change).
 * Ascending bars will speed up the paddle movement.
 * Descending bars will slow down the paddle movement.
+
+A demo: https://www.youtube.com/watch?v=MzB-iWMSaQ4
