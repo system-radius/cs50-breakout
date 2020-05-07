@@ -27,7 +27,7 @@ function VictoryState:update(dt)
       score = self.score,
       level = self.level + 1,
       highscores = self.highscores,
-      key = self.keys
+      keys = self.keys
     })
 
   end
