@@ -254,7 +254,8 @@ function PlayState:updateBall(ball, dt)
           health = self.health,
           score = self.score,
           level = self.level,
-          highscores = self.highscores
+          highscores = self.highscores,
+          keys = self.keys
         })
       end
     end
