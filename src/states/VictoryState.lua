@@ -8,6 +8,7 @@ function VictoryState:enter(params)
   self.level = params.level
   self.ball = params.ball
   self.highscores = params.highscores
+  self.keys = params.keys
 
 end
 
@@ -25,7 +26,8 @@ function VictoryState:update(dt)
       bricks = LevelMaker.createMap(self.level + 1),
       score = self.score,
       level = self.level + 1,
-      highscores = self.highscores
+      highscores = self.highscores,
+      key = self.keys
     })
 
   end

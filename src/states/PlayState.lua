@@ -10,6 +10,8 @@ function PlayState:enter(params)
   self.ball = params.ball
   self.highscores = params.highscores
 
+  self.keys = params.keys
+
   self.activeBalls = 1
   self.balls = {}
 
@@ -43,7 +45,7 @@ end
 ]]
 function PlayState:canGeneratePowerUp()
 
-  if self.level % 5 == 0 then
+  if self.level % 5 == 0 or self.level == 1 then
     -- If the current level is divisible by 5, treat it like a bonus level and allow
     -- all destroyed bricks to generate power ups.
     return true
@@ -135,7 +137,7 @@ function PlayState:applyPowerUp(powerUp)
     gSounds['confirm']:stop()
     gSounds['confirm']:play()
     -- All other power-ups will allow for the key to activate
-    self.unlock = true
+    self.keys = self.keys + 1
   end
 end
 
@@ -167,21 +169,25 @@ function PlayState:updateBall(ball, dt)
   for k, brick in pairs(self.bricks) do
     -- This loop is only for checking brick collisions
     if brick.inPlay and ball:collides(brick) then
-      brick:hit(self.unlock)
+      
+      local addition = (brick.tier * 200 + brick.color * 25)
+
+      if brick.locked and self.keys > 0 then
+        brick:hit(true)
+        addition = addition * 2
+        self.keys = math.max(0, self.keys - 1)
+      else
+        brick:hit(false)
+      end
 
       if not brick.inPlay and self:canGeneratePowerUp() then
         -- Calculate the chances of this brick generating power ups
         table.insert(self.powerUps, self:generatePowerUp(brick))
       end
 
-      local addition = (brick.tier * 200 + brick.color * 25)
-
-      if brick.wasLocked then
-        -- Double the score for unlocking the brick.
-        addition = addition * 2
+      if not brick.locked then
+        self.score = self.score + addition
       end
-
-      self.score = self.score + addition
 
       -- Check for victory
       if self:checkVictory() then
@@ -193,7 +199,8 @@ function PlayState:updateBall(ball, dt)
           score = self.score,
           level = self.level,
           ball = tempBall,
-          highscores = self.highscores
+          highscores = self.highscores,
+          keys = self.keys
         })
       end
 
@@ -364,6 +371,12 @@ function PlayState:render()
 
   renderHealth(self.health)
   renderScore(self.score)
+
+  -- Draw a key to signify that the player can now unlock blocks.
+	love.graphics.draw(gTextures['main'], gFrames['power-ups'][10], VIRTUAL_WIDTH - 140, 3, 0, 0.7, 0.7)
+	love.graphics.setFont(gFonts['small'])
+	love.graphics.setColor(255, 255, 255, 255)		
+	love.graphics.print('x' .. tostring(self.keys), VIRTUAL_WIDTH - 125, 4)
 
   if self.paused then
     love.graphics.setFont(gFonts['large'])

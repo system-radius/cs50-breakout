@@ -20,6 +20,7 @@ function LevelMaker.createMap(level)
 
   local highestTier = math.min(3, math.floor(level / 5))
   local highestColor = math.min(5, level % 5 + 3)
+  local lockedBricks = 0
 
   for y = 1, numRows do
 
@@ -81,6 +82,7 @@ function LevelMaker.createMap(level)
 
       if math.random(10) == 1 then
         -- One last flag for locking the brick.
+        lockedBricks = lockedBricks + 1
         b.locked = true
       end
       table.insert(bricks, b)
@@ -92,6 +94,6 @@ function LevelMaker.createMap(level)
   if #bricks == 0 then
     return LevelMaker.createMap(level)
   else
-    return bricks
+    return bricks, lockedBricks
   end
 end
