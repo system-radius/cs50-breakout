@@ -111,6 +111,12 @@ function PlayState:applyPowerUp(powerUp)
     gSounds['no-select']:stop()
     gSounds['confirm']:stop()
     gSounds['no-select']:play()
+    if self.health == 0 then
+      gStateMachine:change('game-over', {
+        score = self.score,
+        highscores = self.highscores
+      })
+    end
   elseif powerUp == 5 then
     self.paddle.speed = math.min(PADDLE_SPEED_MAX, self.paddle.speed + PADDLE_SPEED_INCREMENT)
     gSounds['no-select']:stop()
