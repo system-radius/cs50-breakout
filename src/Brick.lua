@@ -38,6 +38,7 @@ function Brick:init(x, y, locked)
 
   -- For scoring purposes, to know that this brick was priorly locked.
   self.wasLocked = false
+  self.hasKey = false
 
   self.x = x
   self.y = y
@@ -61,7 +62,6 @@ function Brick:init(x, y, locked)
   )
 
   self.pSystem:setAreaSpread('normal', 10, 10)
-
 
 end
 
