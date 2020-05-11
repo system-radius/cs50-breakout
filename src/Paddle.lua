@@ -13,7 +13,7 @@ function Paddle:collides(target)
   return true
 end
 
-function Paddle:init()
+function Paddle:init(skin)
 
   -- The paddle width may change along the course of the game.
   self.width = 64
@@ -30,7 +30,7 @@ function Paddle:init()
   -- There should be no movement along Y-axis
   self.dx = 0
 
-  self.skin = 1
+  self.skin = skin
   self.size = 2
 
   self.speed = PADDLE_SPEED
