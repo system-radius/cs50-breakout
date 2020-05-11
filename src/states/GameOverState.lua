@@ -57,4 +57,5 @@ function GameOverState:findHighscore()
     end
   end
 
+  return false
 end
