@@ -18,8 +18,10 @@ function LevelMaker.createMap(level)
 
   numCols = numCols % 2 == 0 and (numCols + 1) or numCols
 
-  local highestTier = math.min(3, math.floor(level / 5))
-  local highestColor = math.min(5, level % 5 + 3)
+  local flooredLevel = math.floor((level - 1) / 5)
+  local highestTier = math.min(3, flooredLevel)
+  local highestColor = ((level - 1) % 5) + 1
+  local minColor = math.min(flooredLevel + 1, highestColor)
   local lockedBricks = 0
 
   for y = 1, numRows do
@@ -31,8 +33,8 @@ function LevelMaker.createMap(level)
     local alternatePattern = math.random(2) == 1 and true or false
 
     -- Retrieve alternates. These are used if the alternatePattern flag is true.
-    local alternateColor1 = math.random(1, highestColor)
-    local alternateColor2 = math.random(1, highestColor)
+    local alternateColor1 = math.random(minColor, highestColor)
+    local alternateColor2 = math.random(minColor, highestColor)
     local alternateTier1 = math.random(0, highestTier)
     local alternateTier2 = math.random(0, highestTier)
 
@@ -43,7 +45,7 @@ function LevelMaker.createMap(level)
     local alternateFlag = math.random(2) == 1 and true or false
 
     -- The color and tier to be used if the alternatePattern is not true
-    local solidColor = math.random(1, highestColor)
+    local solidColor = math.random(minColor, highestColor)
     local solidTier = math.random(0, highestTier)
 
     for x = 1, numCols do
@@ -60,7 +62,7 @@ function LevelMaker.createMap(level)
         goto continue
       end
 
-      -- Actual brick addition
+      -- Actual brick creation
       b = Brick((x - 1) * 32 + 8 + (13 - numCols) * 16, y * 16)
 
       -- if we're alternating, figure out which color/tier we're on
@@ -79,12 +81,6 @@ function LevelMaker.createMap(level)
         b.color = solidColor
         b.tier = solidTier
       end
-
-      if math.random(10) == 1 then
-        -- One last flag for locking the brick.
-        lockedBricks = lockedBricks + 1
-        b.locked = true
-      end
       table.insert(bricks, b)
 
       ::continue::
@@ -94,6 +90,35 @@ function LevelMaker.createMap(level)
   if #bricks == 0 then
     return LevelMaker.createMap(level)
   else
-    return bricks, lockedBricks
+
+    local limit = math.floor(#bricks / 2)
+    -- lock some of the bricks.
+    while limit > 0 do
+      local b = bricks[math.random(#bricks)]
+      if math.random(4) == 1 then
+        -- One last flag for locking the brick.
+        b.locked = true
+
+        -- Keep track of the locked bricks for key generation
+        lockedBricks = lockedBricks + 1
+      end
+
+      -- Regardless of whether a brick was locked or not, the limit will decrease
+      limit = limit - 1
+    end
+
+    -- For each of the locked bricks
+    while lockedBricks > 0 do
+
+      local randomIndex = math.random(#bricks)
+
+      local brick = bricks[randomIndex]
+      if not (brick.locked or brick.hasKey) then
+        brick.hasKey = true
+        lockedBricks = lockedBricks - 1
+      end
+    end
+
+    return bricks, 0
   end
 end
