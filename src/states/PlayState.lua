@@ -111,7 +111,7 @@ function PlayState:applyPowerUp(powerUp)
     gSounds['no-select']:stop()
     gSounds['confirm']:stop()
     gSounds['no-select']:play()
-    if self.health == 0 then
+    if self.health <= 0 then
       gStateMachine:change('game-over', {
         score = self.score,
         highscores = self.highscores
@@ -255,7 +255,7 @@ function PlayState:updateBall(ball, dt)
       self.paddle.width = self.paddle.size * 32
       gSounds['hurt']:play()
 
-      if self.health == 0 then
+      if self.health <= 0 then
         gStateMachine:change('game-over', {
           score = self.score,
           highscores = self.highscores
