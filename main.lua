@@ -116,9 +116,6 @@ function love.draw()
     )
 
   gStateMachine:render()
-
-  displayFPS()
-
   push:finish()
 end
 
