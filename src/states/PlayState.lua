@@ -50,8 +50,8 @@ function PlayState:canGeneratePowerUp()
     -- all destroyed bricks to generate power ups.
     return true
   end
-  -- Give a 25% chance for a brick to generate a power up.
-  return math.random(4) == 1 and true or false
+  -- Give a 50% chance for a brick to generate a power up.
+  return math.random(2) == 1 and true or false
 end
 
 --[[
@@ -59,10 +59,15 @@ end
 ]]
 function PlayState:generatePowerUp(brick)
 
-  -- There are 10 power ups to choose from
-  local bonus = math.random(10)
   local x = (brick.x + (brick.width / 2)) - (POWER_UP_SIZE / 2)
   local y = brick.y
+
+  if brick.hasKey then
+    return PowerUp(10, x, y)
+  end
+
+  -- There are 10 power ups to choose from
+  local bonus = math.random(10)
 
   if bonus == 7 or bonus == 8 then
     -- It is quite hard to implement the differing size for the ball,
@@ -180,7 +185,7 @@ function PlayState:updateBall(ball, dt)
         brick:hit(false)
       end
 
-      if not brick.inPlay and self:canGeneratePowerUp() then
+      if not brick.inPlay and (self:canGeneratePowerUp() or brick.hasKey) then
         -- Calculate the chances of this brick generating power ups
         table.insert(self.powerUps, self:generatePowerUp(brick))
       end
@@ -240,6 +245,8 @@ function PlayState:updateBall(ball, dt)
     self.activeBalls = self.activeBalls - 1
     if self.activeBalls == 0 then
       self.health = self.health - 1
+      self.paddle.size = math.max(1, self.paddle.size - 1)
+      self.paddle.width = self.paddle.size * 32
       gSounds['hurt']:play()
 
       if self.health == 0 then
@@ -372,6 +379,9 @@ function PlayState:render()
 
   renderHealth(self.health)
   renderScore(self.score)
+  love.graphics.setFont(gFonts['small'])
+
+  love.graphics.print('Level ' .. tostring(self.level), 5, 5)
 
   -- Draw a key to signify that the player can now unlock blocks.
 	love.graphics.draw(gTextures['main'], gFrames['power-ups'][10], VIRTUAL_WIDTH - 140, 3, 0, 0.7, 0.7)
